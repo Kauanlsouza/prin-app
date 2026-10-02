@@ -1,0 +1,4 @@
+{
+  "email_assunto": "Devolucao em atraso - {armario}",
+  "email_corpo": "Ola {nome},\n\nidentificamos que o {armario} esta com devolucao prevista para {prazo}.\nLocalizacao: {localizacao}.\n\nPedimos a regularizacao o quanto antes.\n\nEquipe de armarios"
+}

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.jpg" type="image/jpeg">
+<title>Sistema de Armarios</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="topo">
+    <h1>Sistema de Armarios</h1>
+    <p>Estrutura real dos armarios, separados por localizacao e tamanho para uma apresentacao mais profissional.</p>
+</div>
+
+<nav class="navbar" aria-label="Navegacao principal">
+    <div class="navbar__inner">
+        <a class="navbar__brand" href="/" data-route="">
+            <strong>Sistema de Armarios</strong>
+            <span>Painel central e operacoes do dia a dia</span>
+        </a>
+        <div class="navbar__links">
+            <a class="nav-link ativo" href="/" data-page="inicio" data-route="">Inicio</a>
+            <a class="nav-link" href="/movimentacoes.html" data-page="movimentacoes" data-route="movimentacoes.html">Movimentacoes</a>
+            <a class="nav-link" href="/consulta.html" data-page="consulta" data-route="consulta.html">Consulta</a>
+            <a class="nav-link" href="/disponibilidade.html" data-page="disponibilidade" data-route="disponibilidade.html">Disponibilidade</a>
+            <a class="nav-link" href="/historico.html" data-page="historico" data-route="historico.html">Historico</a>
+            <a class="nav-link" href="/configuracoes.html" data-page="configuracoes" data-route="configuracoes.html">Configuracoes</a>
+        </div>
+    </div>
+</nav>
+
+<div class="faixa-status">
+    <div class="alerta-topo">
+        <div>
+            <strong id="alerta-atrasos">Nenhum atraso no momento.</strong>
+            <div class="dica">O painel destaca os armarios por localizacao, com os numeros 89 a 120 no andar de baixo e os grandes de 81 a 88 em evidencia.</div>
+        </div>
+    </div>
+</div>
+
+<p id="mensagem" class="mensagem"></p>
+<div id="toast-stack" class="toast-stack"></div>
+<div class="legenda-global">
+    <span class="pill pill--livre">Livre</span>
+    <span class="pill pill--ocupado">Ocupado</span>
+    <span class="pill pill--atrasado">Atrasado</span>
+    <span class="pill pill--hoje">Vence hoje</span>
+    <span class="pill pill--amanha">Vence amanha</span>
+</div>
+<div id="feedback-operacao" class="feedback-operacao oculto"></div>
+<div id="armario-modal" class="armario-modal oculto" aria-hidden="true"></div>
+
+<main class="conteudo">
+<section id="secao-inicio" class="pagina-secao">
+    <div class="secao-cabecalho">
+        <div>
+            <span class="secao-eyebrow">Inicio</span>
+            <h2>Painel rapido do turno</h2>
+            <p>Esta tela fica mais direta: visao geral, proximas devolucoes, atrasados e acessos para as tarefas do dia.</p>
+        </div>
+        <span class="mini-tag">Painel em tempo real</span>
+    </div>
+    <div class="painel painel--inicio">
+    <div class="card span-12">
+        <h3>Resumo</h3>
+        <p class="subtitulo">Visao geral da disponibilidade e da estrutura do sistema.</p>
+        <div class="resumo">
+            <div class="badge"><span class="badge__label">Livres</span><span id="resumo-livre" class="badge__value">-</span></div>
+            <div class="badge"><span class="badge__label">Ocupados</span><span id="resumo-ocupado" class="badge__value">-</span></div>
+            <div class="badge badge--alerta"><span class="badge__label">Atrasados</span><span id="resumo-atrasado" class="badge__value">-</span></div>
+            <div class="badge badge--neutro"><span class="badge__label">Armarios</span><span id="resumo-convencional" class="badge__value">-</span></div>
+            <div class="badge badge--neutro"><span class="badge__label">Grandes</span><span id="resumo-grande" class="badge__value">-</span></div>
+            <div class="badge"><span class="badge__label">Vence hoje</span><span id="resumo-vence-hoje" class="badge__value">-</span></div>
+            <div class="badge"><span class="badge__label">Vence amanha</span><span id="resumo-vence-amanha" class="badge__value">-</span></div>
+            <div class="badge"><span class="badge__label">Prox. 7 dias</span><span id="resumo-proximos-sete" class="badge__value">-</span></div>
+            <div class="badge"><span class="badge__label">Ocupacao</span><span id="resumo-ocupacao" class="badge__value">-</span></div>
+        </div>
+    </div>
+
+    <div class="card span-12">
+        <h3>Acoes rapidas</h3>
+        <p class="subtitulo">Use os atalhos principais e deixe o painel detalhado para as telas especificas.</p>
+        <div class="acoes-rapidas-grid">
+            <a class="acao-rapida" href="/movimentacoes.html" data-route="movimentacoes.html">
+                <strong>Registrar emprestimo</strong>
+                <span>Cadastrar participantes com email obrigatorio.</span>
+            </a>
+            <a class="acao-rapida" href="/movimentacoes.html" data-route="movimentacoes.html">
+                <strong>Registrar devolucao</strong>
+                <span>Buscar por armario ou prontuario e concluir o retorno.</span>
+            </a>
+            <a class="acao-rapida" href="/consulta.html" data-route="consulta.html">
+                <strong>Consultar armario</strong>
+                <span>Encontrar rapidamente um emprestimo ativo.</span>
+            </a>
+        </div>
+    </div>
+    <div class="card span-12">
+        <div class="card-cabecalho">
+            <div>
+                <h3>Atrasados</h3>
+                <p class="subtitulo">Os atrasos aparecem por faixa de urgencia, com email e botao de cobranca automatica.</p>
+            </div>
+            <button type="button" class="botao-secundario" onclick="listarAtrasados()">Atualizar atrasados</button>
+        </div>
+        <div id="lista-atrasados" class="saida lista-texto"></div>
+    </div>
+    <div class="card span-12">
+        <h3>Proximas devolucoes</h3>
+        <p class="subtitulo">Uma visao curta das proximas devolucoes para organizar a rotina sem precisar abrir o historico.</p>
+        <div id="agenda-devolucoes" class="agenda-grid"></div>
+    </div>
+</div>
+</section>
+
+<section id="secao-movimentacoes" class="pagina-secao">
+    <div class="secao-cabecalho">
+        <div>
+            <span class="secao-eyebrow">Movimentacoes</span>
+            <h2>Emprestimos e devolucoes</h2>
+            <p>As duas operacoes mais frequentes ficam agrupadas, com destaque maior para o emprestimo e uma devolucao mais direta ao lado.</p>
+        </div>
+        <span class="mini-tag">Fluxo operacional</span>
+    </div>
+    <div class="painel painel--movimentacoes">
+    <div class="card card--principal">
+        <h3>Emprestar</h3>
+        <p class="subtitulo">Cadastre todos os participantes exigidos para esse emprestimo, sempre com email obrigatorio.</p>
+        <input id="tipo-armario" type="hidden" value="convencional">
+        <input id="num" type="number" min="1" placeholder="Numero do armario">
+        <div class="emprestimo-capacidade">
+            <div>
+                <strong id="emprestimo-capacidade-titulo">2 participantes</strong>
+                <p id="emprestimo-capacidade-texto">Armarios de tamanho padrao exigem 2 participantes.</p>
+            </div>
+            <span id="emprestimo-capacidade-badge" class="mini-tag">1/2</span>
+        </div>
+        <div id="participantes-emprestimo" class="participantes-grid"></div>
+        <button id="botao-adicionar-participante" type="button" class="botao-secundario botao-mais" onclick="adicionarParticipante()">
+            <span aria-hidden="true">+</span>
+            <span>Adicionar participante</span>
+        </button>
+        <label class="campo-cadeado">
+            <input id="cadeado-proprio" type="checkbox">
+            <span class="campo-cadeado__texto">
+                <strong>Armario com cadeado proprio</strong>
+                <small>Marque quando os participantes utilizarem o proprio cadeado.</small>
+            </span>
+        </label>
+        <input id="data_prev" type="date">
+        <button id="botao-emprestar" type="button" onclick="emprestar()">Emprestar</button>
+    </div>
+
+    <div class="card card--apoio">
+        <h3>Devolver</h3>
+        <p class="subtitulo">Voce pode localizar a devolucao pelo armario ou pelo prontuario. A devolucao continua encerrando o emprestimo inteiro.</p>
+        <select id="modo-devolucao">
+            <option value="armario">Buscar por armario</option>
+            <option value="prontuario">Buscar por prontuario</option>
+        </select>
+        <div id="campos-devolucao-armario">
+            <input id="tipo-dev" type="hidden" value="convencional">
+            <input id="num_dev" type="number" min="1" placeholder="Numero do armario">
+        </div>
+        <div id="campos-devolucao-prontuario" class="oculto">
+            <input id="prontuario-dev" placeholder="Prontuario do aluno">
+            <div class="dica">Se buscar por prontuario, o sistema localiza o armario ativo e devolve o emprestimo completo.</div>
+        </div>
+        <button id="botao-devolver" type="button" onclick="devolver()">Devolver</button>
+    </div>
+
+</div>
+</section>
+
+<section id="secao-consulta" class="pagina-secao">
+    <div class="secao-cabecalho">
+        <div>
+            <span class="secao-eyebrow">Consulta</span>
+            <h2>Busca por armario ou prontuario</h2>
+            <p>Uma area mais focada para localizar rapidamente um registro especifico sem disputar espaco com as outras operacoes.</p>
+        </div>
+        <span class="mini-tag">Busca rapida</span>
+    </div>
+    <div class="painel painel--consulta">
+    <div class="card">
+        <h3>Consultar</h3>
+        <p class="subtitulo">Busca por armario especifico ou por prontuario. Quando fizer sentido, o resultado aparece automaticamente enquanto voce digita.</p>
+        <select id="tipo-consulta" onchange="atualizarTipoConsulta()">
+            <option value="numero">Armario especifico</option>
+            <option value="prontuario">Prontuario</option>
+        </select>
+        <input id="tipo-consulta-armario" type="hidden" value="convencional">
+        <input id="valor-consulta" placeholder="Digite o numero ou prontuario">
+        <button id="botao-consultar" type="button" onclick="consultar()">Consultar</button>
+        <div id="resultado-consulta" class="saida"></div>
+    </div>
+    <div id="painel-edicao-consulta" class="card oculto">
+        <div class="card-cabecalho">
+            <div>
+                <h3>Editar emprestimo</h3>
+                <p class="subtitulo">Revise os participantes, o prazo e a informacao de cadeado do armario selecionado.</p>
+            </div>
+            <button type="button" class="botao-secundario" onclick="limparEdicaoEmprestimo()">Fechar edicao</button>
+        </div>
+        <input id="tipo-edicao" type="hidden" value="convencional">
+        <input id="num-edicao" type="hidden">
+        <div id="edicao-emprestimo" class="saida oculto">
+            <div id="edicao-emprestimo-resumo" class="edicao-resumo"></div>
+            <div class="emprestimo-capacidade">
+                <div>
+                    <strong id="edicao-capacidade-titulo">2 participantes</strong>
+                    <p id="edicao-capacidade-texto">Carregue um emprestimo para editar os participantes.</p>
+                </div>
+                <span id="edicao-capacidade-badge" class="mini-tag">0/0</span>
+            </div>
+            <div id="participantes-edicao" class="participantes-grid"></div>
+            <button id="botao-adicionar-edicao" type="button" class="botao-secundario botao-mais" onclick="adicionarParticipanteEdicao()">
+                <span aria-hidden="true">+</span>
+                <span>Adicionar participante</span>
+            </button>
+            <label class="campo-cadeado">
+                <input id="cadeado-proprio-edicao" type="checkbox">
+                <span class="campo-cadeado__texto">
+                    <strong>Armario com cadeado proprio</strong>
+                    <small>Atualize esta opcao se o cadeado utilizado mudou.</small>
+                </span>
+            </label>
+            <input id="data_prev_edicao" type="date">
+            <div class="saida-acoes">
+                <button id="botao-salvar-edicao" type="button" onclick="salvarEdicaoEmprestimo()">Salvar alteracoes</button>
+                <button type="button" class="botao-secundario" onclick="limparEdicaoEmprestimo()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<section id="secao-disponibilidade" class="pagina-secao">
+    <div class="secao-cabecalho">
+        <div>
+            <span class="secao-eyebrow">Disponibilidade</span>
+            <h2>Painel compacto de armarios</h2>
+            <p>O grid detalhado sai da home e fica concentrado aqui, em modo mais compacto, com filtros e detalhes sob demanda.</p>
+        </div>
+        <span class="mini-tag">Consulta operacional</span>
+    </div>
+    <div class="painel painel--disponibilidade">
+    <div class="card span-12">
+        <h3>Painel de Armarios</h3>
+        <p class="subtitulo">Os cards ficam mais compactos e mostram detalhes completos so quando for preciso.</p>
+        <div class="linha">
+            <button id="botao-lista" type="button" onclick="alternarListaArmarios()">Ocultar painel</button>
+            <input id="filtro-armario" placeholder="Filtrar por tipo, numero, aluno, email, curso, prontuario, localizacao ou tamanho" oninput="renderizarArmariosFiltrados()">
+        </div>
+        <div class="filtros-rapidos">
+            <button type="button" class="chip ativo" data-filtro="todos" onclick="definirFiltroRapido('todos')">Todos</button>
+            <button type="button" class="chip" data-filtro="livre" onclick="definirFiltroRapido('livre')">Livres</button>
+            <button type="button" class="chip" data-filtro="ocupado" onclick="definirFiltroRapido('ocupado')">Ocupados</button>
+            <button type="button" class="chip" data-filtro="atrasado" onclick="definirFiltroRapido('atrasado')">Atrasados</button>
+            <button type="button" class="chip" data-filtro="vence_hoje" onclick="definirFiltroRapido('vence_hoje')">Vence hoje</button>
+            <button type="button" class="chip" data-filtro="vence_amanha" onclick="definirFiltroRapido('vence_amanha')">Vence amanha</button>
+        </div>
+        <div id="lista-wrapper" class="saida">
+            <div id="lista" class="grupos-armarios"></div>
+        </div>
+    </div>
+
+    <div class="card span-12">
+        <h3>Armarios com vaga</h3>
+        <p class="subtitulo">Visual resumido por grupo para localizar disponibilidade sem misturar com os atrasos.</p>
+        <input id="livres-tipo" type="hidden" value="convencional">
+        <button type="button" onclick="listarLivres()">Atualizar disponibilidade</button>
+        <div id="lista-livres" class="saida lista-texto"></div>
+    </div>
+</div>
+</section>
+
+<section id="secao-historico" class="pagina-secao">
+    <div class="secao-cabecalho">
+        <div>
+            <span class="secao-eyebrow">Historico</span>
+            <h2>Registros, exportacao e impressao</h2>
+            <p>O historico fecha a navegacao com uma area ampla para filtros, tabela e saidas de relatorio sem apertar o grid.</p>
+        </div>
+        <span class="mini-tag">Auditoria e relatorios</span>
+    </div>
+    <div class="painel painel--historico">
+    <div class="card span-12">
+        <h3>Historico de Emprestimos</h3>
+        <p class="subtitulo">Os filtros ficam recolhidos por padrao, com resumo do periodo logo acima da tabela.</p>
+        <div class="acoes-historico">
+            <button id="botao-filtros-historico" type="button" onclick="alternarFiltrosHistorico()">Mostrar filtros</button>
+            <button type="button" class="botao-secundario" onclick="reiniciarHistorico()">Buscar historico</button>
+            <button type="button" class="botao-secundario" onclick="exportarHistoricoCsv()">Exportar CSV</button>
+            <button type="button" class="botao-secundario" onclick="alternarPainelImpressao()">Imprimir relatorio</button>
+        </div>
+        <div id="historico-filtros-wrap" class="historico-filtros-wrap oculto">
+            <div class="historico-grid">
+                <input id="hist-nome" placeholder="Filtrar por nome">
+                <input id="hist-prontuario" placeholder="Filtrar por prontuario">
+                <select id="hist-tipo">
+                    <option value="">Todos os armarios</option>
+                    <option value="convencional">Armarios</option>
+                </select>
+                <select id="hist-status">
+                    <option value="">Todos os status</option>
+                    <option value="ativos">Somente ativos</option>
+                    <option value="devolvidos">Somente devolvidos</option>
+                </select>
+                <input id="hist-data-inicio" type="date">
+                <input id="hist-data-fim" type="date">
+            </div>
+        </div>
+        <div class="historico-topbar">
+            <div class="historico-topbar__grupo">
+                <span id="historico-resumo-paginacao" class="mini-tag">0 registros</span>
+                <span id="historico-resumo-status" class="mini-tag">0 ativos | 0 devolvidos | 0 atrasados</span>
+                <span id="historico-resumo-ordenacao" class="mini-tag">Ordenado por retirada</span>
+            </div>
+            <div class="historico-topbar__grupo">
+                <label for="hist-por-pagina" class="dica">Itens por pagina</label>
+                <select id="hist-por-pagina">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+        <div id="painel-impressao" class="impressao-painel oculto">
+            <div class="impressao-opcoes">
+                <label class="impressao-item">
+                    <input type="checkbox" name="opcao-impressao" value="historico" checked>
+                    <span>
+                        <strong>Historico de emprestimos</strong>
+                        <span>Inclui os registros filtrados na tabela.</span>
+                    </span>
+                </label>
+                <label class="impressao-item">
+                    <input type="checkbox" name="opcao-impressao" value="resumo">
+                    <span>
+                        <strong>Resumo</strong>
+                        <span>Mostra os indicadores principais do painel.</span>
+                    </span>
+                </label>
+                <label class="impressao-item">
+                    <input type="checkbox" name="opcao-impressao" value="livres">
+                    <span>
+                        <strong>Armarios livres</strong>
+                        <span>Imprime a disponibilidade agrupada por tipo.</span>
+                    </span>
+                </label>
+                <label class="impressao-item">
+                    <input type="checkbox" name="opcao-impressao" value="atrasados">
+                    <span>
+                        <strong>Atrasados</strong>
+                        <span>Lista somente os armarios com pendencias.</span>
+                    </span>
+                </label>
+            </div>
+            <div class="impressao-painel__acoes">
+                <button type="button" onclick="imprimirHistorico()">Confirmar impressao</button>
+                <button type="button" class="botao-secundario" onclick="alternarPainelImpressao(false)">Cancelar</button>
+            </div>
+        </div>
+        <div class="dica">Os filtros atualizam sozinhos enquanto voce digita ou troca o tipo do armario.</div>
+        <div id="historico" class="saida"></div>
+        <div id="historico-paginacao" class="historico-paginacao"></div>
+    </div>
+    </div>
+</section>
+<section id="secao-configuracoes" class="pagina-secao">
+    <div class="secao-cabecalho">
+        <div>
+            <span class="secao-eyebrow">Configuracoes</span>
+            <h2>Email de cobranca e regras da operacao</h2>
+            <p>Personalize o texto padrao das cobrancas e deixe as regras do uso do sistema visiveis para toda a equipe.</p>
+        </div>
+        <span class="mini-tag">Preferencias do sistema</span>
+    </div>
+    <div class="painel">
+        <div class="card span-12">
+            <h3>Acesso ao sistema</h3>
+            <p id="sessao-funcionario" class="subtitulo">Verificando funcionario logado...</p>
+            <div class="saida-acoes">
+                <button type="button" class="botao-secundario" onclick="atualizarTudo()">Atualizar dados do sistema</button>
+                <button type="button" class="botao-secundario" onclick="sairDoSistema()">Sair da conta</button>
+            </div>
+        </div>
+        <div class="card span-12">
+            <h3>Aparencia</h3>
+            <p class="subtitulo">Escolha o modo visual do sistema sem ocupar espaco na barra superior.</p>
+            <div class="saida-acoes">
+                <button id="tema-botao-config" type="button" class="tema-botao" onclick="alternarTema()">
+                    <span id="tema-icone">&#9790;</span>
+                    <span id="tema-texto">Modo escuro</span>
+                </button>
+            </div>
+        </div>
+        <div class="card span-12 admin-only">
+            <h3>Email de cobranca</h3>
+            <p class="subtitulo">Use os marcadores {nome}, {armario}, {prazo}, {localizacao}, {tipo}, {curso} e {email} para personalizar a mensagem.</p>
+            <div id="config-smtp-status" class="config-status"></div>
+            <input id="config-email-assunto" placeholder="Assunto do email">
+            <textarea id="config-email-corpo" rows="8" placeholder="Corpo padrao do email"></textarea>
+            <div class="saida-acoes">
+                <button type="button" onclick="salvarConfiguracoes()">Salvar configuracoes</button>
+                <button type="button" class="botao-secundario" onclick="restaurarConfiguracoesPadrao()">Restaurar texto padrao</button>
+            </div>
+        </div>
+        <div class="card span-12 admin-only">
+            <h3>Cadastrar novo usuario</h3>
+            <p class="subtitulo">Crie um usuario e uma senha para cada funcionario que utilizar o sistema.</p>
+            <form class="funcionarios-form" onsubmit="cadastrarFuncionario(event)">
+                <label>Nome completo<input id="funcionario-nome" autocomplete="name" required></label>
+                <label>Usuario de acesso<input id="funcionario-usuario" autocomplete="username" required></label>
+                <label>Senha inicial<input id="funcionario-senha" type="password" autocomplete="new-password" minlength="6" required></label>
+                <label>Papel<select id="funcionario-papel"><option value="operador">Operador</option><option value="administrador">Administrador</option></select></label>
+                <button type="submit">Cadastrar conta</button>
+            </form>
+            <div id="lista-funcionarios" class="lista-funcionarios" aria-live="polite"></div>
+        </div>
+        <div class="card span-12 admin-only">
+            <h3>Seguranca e copias de seguranca</h3>
+            <p class="subtitulo">Exporte o banco para guardar em um local seguro. Para recuperar os dados, selecione o arquivo .db salvo. A restauracao substitui todos os dados atuais; o sistema guarda uma copia do banco atual antes da troca.</p>
+            <div class="saida-acoes"><button type="button" onclick="baixarBackup()">Exportar banco de dados</button></div>
+            <hr>
+            <label for="arquivo-backup">Restaurar backup (.db)</label>
+            <div class="saida-acoes"><input id="arquivo-backup" type="file" accept=".db,application/octet-stream"><button type="button" class="botao-secundario" onclick="restaurarBackup()">Restaurar backup</button></div>
+            <p class="dica">A restauracao substitui os dados atuais. Uma copia do banco atual sera salva automaticamente antes da troca.</p>
+            <hr>
+            <p class="subtitulo">Privacidade: remova nomes, e-mails, prontuarios e cursos de emprestimos devolvidos ate a data escolhida. Esta acao nao pode ser desfeita.</p>
+            <div class="saida-acoes"><input id="data-anonimizacao" type="date" aria-label="Data limite para anonimizar"><button type="button" class="botao-secundario" onclick="anonimizarHistorico()">Anonimizar historico</button></div>
+        </div>
+        <div class="card span-12 admin-only">
+            <h3>Registro de atividades</h3>
+            <p class="subtitulo">Ultimas acoes administrativas e operacionais registradas pelo sistema.</p>
+            <div id="lista-auditoria" class="lista-funcionarios" aria-live="polite"></div>
+        </div>
+        <div class="card span-12">
+            <h3>Regras do sistema</h3>
+            <p class="subtitulo">Essas regras ficam visiveis para reduzir erro operacional e padronizar o atendimento.</p>
+            <div class="regras-grid">
+                <div class="regra-card">
+                    <strong>Convencional padrao</strong>
+                    <span>2 participantes por emprestimo.</span>
+                </div>
+                <div class="regra-card">
+                    <strong>Convencional grande</strong>
+                    <span>3 participantes por emprestimo.</span>
+                </div>
+                <div class="regra-card">
+                    <strong>Email obrigatorio</strong>
+                    <span>Todo participante precisa de email valido para concluir o cadastro.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+<script src="/static/js/app.js" defer></script>
+</body>
+</html>
